@@ -1,4 +1,4 @@
-package com.manhdd.nuce.khoamanhinhnhandangkhuanmat;
+package com.manhdd.nuce.khoamanhinhnhandangkhuanmat.manhinh;
 
 import android.os.Build;
 import android.os.Bundle;
@@ -6,6 +6,9 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageView;
+
+import com.manhdd.nuce.khoamanhinhnhandangkhuanmat.R;
 
 /**
  * Created by glenn on 1/30/18.
@@ -18,6 +21,14 @@ public class ManHinhKhoa extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         makeFullScreen();
         setContentView(R.layout.man_hinh_khoa);
+
+        ImageView ivNhanDangKhuanMat = (ImageView) findViewById(R.id.iv_nhan_dang_khuan_mat);
+        ivNhanDangKhuanMat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
     }
 
     public void makeFullScreen() {

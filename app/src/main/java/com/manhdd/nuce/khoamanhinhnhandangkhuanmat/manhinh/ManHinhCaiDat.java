@@ -1,8 +1,11 @@
-package com.manhdd.nuce.khoamanhinhnhandangkhuanmat;
+package com.manhdd.nuce.khoamanhinhnhandangkhuanmat.manhinh;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+
+import com.manhdd.nuce.khoamanhinhnhandangkhuanmat.DichVuManHinhKhoa;
+import com.manhdd.nuce.khoamanhinhnhandangkhuanmat.R;
 
 public class ManHinhCaiDat extends AppCompatActivity {
 

@@ -15,7 +15,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ManHinhCaiDat">
+        <activity android:name=".manhinh.ManHinhCaiDat">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -23,7 +23,8 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ManHinhKhoa"></activity>
+        <activity android:name=".manhinh.ManHinhKhoa"
+                  android:theme="@style/Theme.AppCompat.NoActionBar"></activity>
 
         <service android:name=".DichVuManHinhKhoa" />
 

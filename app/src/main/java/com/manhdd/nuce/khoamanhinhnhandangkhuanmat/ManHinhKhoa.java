@@ -11,13 +11,13 @@ import android.view.WindowManager;
  * Created by glenn on 1/30/18.
  */
 
-public class LockScreenActivity extends AppCompatActivity {
+public class ManHinhKhoa extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         makeFullScreen();
-        setContentView(R.layout.activity_lock_screen);
+        setContentView(R.layout.man_hinh_khoa);
     }
 
     public void makeFullScreen() {

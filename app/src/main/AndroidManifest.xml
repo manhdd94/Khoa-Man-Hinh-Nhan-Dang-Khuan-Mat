@@ -15,7 +15,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".ManHinhCaiDat">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -23,12 +23,12 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".LockScreenActivity"></activity>
+        <activity android:name=".ManHinhKhoa"></activity>
 
-        <service android:name=".LockScreenService" />
+        <service android:name=".DichVuManHinhKhoa" />
 
         <receiver
-            android:name="LockScreenReceiver"
+            android:name=".LangNgheSuKienManHinhKhoa"
             android:enabled="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />

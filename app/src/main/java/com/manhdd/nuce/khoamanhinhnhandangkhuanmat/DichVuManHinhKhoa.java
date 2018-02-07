@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.IBinder;
 
-public class LockScreenService extends Service {
+public class DichVuManHinhKhoa extends Service {
 
     BroadcastReceiver receiver;
 
@@ -33,7 +33,7 @@ public class LockScreenService extends Service {
         filter.addAction(Intent.ACTION_SCREEN_OFF);
         filter.addAction(Intent.ACTION_BOOT_COMPLETED);
 
-        receiver = new LockScreenReceiver();
+        receiver = new LangNgheSuKienManHinhKhoa();
         registerReceiver(receiver, filter);
 
         super.onCreate();

@@ -9,7 +9,7 @@ LOCAL_MODULE := face-lib
 LOCAL_SRC_FILES += $(LOCAL_PATH)/face-lib.cpp $(LOCAL_PATH)/FaceRecognitionLib/Facebase.cpp
 LOCAL_SRC_FILES += $(LOCAL_PATH)/FaceRecognitionLib/Eigenfaces.cpp $(LOCAL_PATH)/FaceRecognitionLib/Fisherfaces.cpp
 LOCAL_SRC_FILES += $(LOCAL_PATH)/FaceRecognitionLib/PCA.cpp $(LOCAL_PATH)/FaceRecognitionLib/LDA.cpp
-LOCAL_C_INCLUDES += $(EIGEN3_DIR) $(LOCAL_PATH)/FaceRecognitionLib/RedSVD/include
+LOCAL_C_INCLUDES += /usr/local/include/eigen3/ $(LOCAL_PATH)/FaceRecognitionLib/RedSVD/include
 LOCAL_LDLIBS += -llog -ldl
 LOCAL_CPPFLAGS += -std=gnu++11 -frtti -fexceptions
 

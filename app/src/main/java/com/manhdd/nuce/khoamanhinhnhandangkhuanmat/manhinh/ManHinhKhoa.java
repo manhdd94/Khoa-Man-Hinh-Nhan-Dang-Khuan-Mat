@@ -1,5 +1,6 @@
 package com.manhdd.nuce.khoamanhinhnhandangkhuanmat.manhinh;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -26,7 +27,8 @@ public class ManHinhKhoa extends AppCompatActivity {
         ivNhanDangKhuanMat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Intent intent = new Intent(ManHinhKhoa.this, ManHinhNhanDang.class);
+                startActivity(intent);
             }
         });
     }

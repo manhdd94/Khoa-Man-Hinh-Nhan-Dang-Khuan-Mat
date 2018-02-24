@@ -20,7 +20,7 @@ public class ManHinhKhoa extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        makeFullScreen();
+        taoManHinhFullScreen();
         setContentView(R.layout.man_hinh_khoa);
 
         ImageView ivNhanDangKhuanMat = (ImageView) findViewById(R.id.iv_nhan_dang_khuan_mat);
@@ -28,12 +28,14 @@ public class ManHinhKhoa extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(ManHinhKhoa.this, ManHinhNhanDang.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.putExtra("is_setting", false);
                 startActivity(intent);
             }
         });
     }
 
-    public void makeFullScreen() {
+    public void taoManHinhFullScreen() {
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         if(Build.VERSION.SDK_INT < 19) { //View.SYSTEM_UI_FLAG_IMMERSIVE is only on API 19+
@@ -50,7 +52,7 @@ public class ManHinhKhoa extends AppCompatActivity {
         }
     }
 
-    public void unlockScreen(View view) {
+    public void moKhoa(View view) {
         android.os.Process.killProcess(android.os.Process.myPid());
     }
 

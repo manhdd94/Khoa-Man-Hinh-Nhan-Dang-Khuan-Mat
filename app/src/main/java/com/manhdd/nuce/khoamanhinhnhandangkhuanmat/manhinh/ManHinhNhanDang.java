@@ -10,7 +10,9 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.SurfaceView;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.manhdd.nuce.khoamanhinhnhandangkhuanmat.NativeMethods;
@@ -33,12 +35,15 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
     private static final String TAG = ManHinhNhanDang.class.getSimpleName();
     private static final int PERMISSIONS_REQUEST_CODE = 3232;
 
-    private CameraBridgeViewBase mOpenCvCameraView;
+    private CameraBridgeViewBase mNhanDangCameraView;
+    private Button btNhanDang;
+
     private TinyDB tinydb;
     private ArrayList<Mat> images;
     private ArrayList<String> imagesLabels;
     private NativeMethods.TrainFacesTask mTrainFacesTask;
     private String[] uniqueLabels;
+    private boolean isSetting;
 
     private NativeMethods.TrainFacesTask.Callback trainFacesTaskCallback = new NativeMethods.TrainFacesTask.Callback() {
         @Override
@@ -57,7 +62,7 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
                 case LoaderCallbackInterface.SUCCESS:
                     NativeMethods.loadNativeLibraries(); // Load native libraries after(!) OpenCV initialization
                     Log.e(TAG, "OpenCV loaded successfully");
-                    mOpenCvCameraView.enableView();
+                    mNhanDangCameraView.enableView();
 
                     // Read images and labels from shared preferences
                     images = tinydb.getListMat("images");
@@ -86,12 +91,27 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
 
         setContentView(R.layout.man_hinh_nhan_dang);
 
+        isSetting = getIntent().getBooleanExtra("is_setting", true);
+
         tinydb = new TinyDB(this);
 
-        mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.camera_view);
-        mOpenCvCameraView.setCameraIndex(CameraBridgeViewBase.CAMERA_ID_FRONT);
-        mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
-        mOpenCvCameraView.setCvCameraViewListener(this);
+        mNhanDangCameraView = (CameraBridgeViewBase) findViewById(R.id.camera_view);
+        mNhanDangCameraView.setCameraIndex(CameraBridgeViewBase.CAMERA_ID_FRONT);
+        mNhanDangCameraView.setVisibility(SurfaceView.VISIBLE);
+        mNhanDangCameraView.setCvCameraViewListener(this);
+
+        btNhanDang = (Button) findViewById(R.id.bt_nhan_dang);
+        if(isSetting) {
+            btNhanDang.setText("Lưu khuân mặt");
+        } else {
+            btNhanDang.setText("Nhận  khuân mặt");
+        }
+        btNhanDang.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
     }
 
     @Override
@@ -109,15 +129,15 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
     @Override
     public void onPause() {
         super.onPause();
-        if (mOpenCvCameraView != null)
-            mOpenCvCameraView.disableView();
+        if (mNhanDangCameraView != null)
+            mNhanDangCameraView.disableView();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (mOpenCvCameraView != null)
-            mOpenCvCameraView.disableView();
+        if (mNhanDangCameraView != null)
+            mNhanDangCameraView.disableView();
     }
 
     @Override

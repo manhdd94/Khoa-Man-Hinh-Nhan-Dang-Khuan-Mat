@@ -1,16 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10dp"
     tools:context="com.manhdd.nuce.khoamanhinhnhandangkhuanmat.manhinh.ManHinhCaiDat">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        android:layout_centerInParent="true"/>
+        card_view:cardCornerRadius="2dp"
+        card_view:cardElevation="3dp"
+        card_view:cardUseCompatPadding="true">
 
-</RelativeLayout>
+        <TextView
+            android:id="@+id/tv_cai_dat_khuan_mat"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:padding="15dp"
+          android:textSize="18sp"
+            android:textColor="#000000"
+            android:text="Cài đặt khuân mặt"/>
+
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>

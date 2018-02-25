@@ -1,6 +1,7 @@
 package com.manhdd.nuce.khoamanhinhnhandangkhuanmat.manhinh;
 
 import android.Manifest;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -23,11 +24,15 @@ import com.manhdd.nuce.khoamanhinhnhandangkhuanmat.view.CameraBridgeViewBase;
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
+import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
@@ -38,6 +43,7 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
     private CameraBridgeViewBase mNhanDangCameraView;
     private Button btNhanDang;
 
+    private Mat mRgba, mGray;
     private TinyDB tinydb;
     private ArrayList<Mat> images;
     private ArrayList<String> imagesLabels;
@@ -64,22 +70,61 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
                     Log.e(TAG, "OpenCV loaded successfully");
                     mNhanDangCameraView.enableView();
 
-                    // Read images and labels from shared preferences
-                    images = tinydb.getListMat("images");
-                    imagesLabels = tinydb.getListString("imagesLabels");
+                    if(!isSetting) {
+                        // Read images and labels from shared preferences
+                        images = tinydb.getListMat("images");
+                        imagesLabels = tinydb.getListString("imagesLabels");
 
-                    Log.e(TAG, "Number of images: " + images.size() + ". Number of labels: " + imagesLabels.size());
-                    if (!images.isEmpty()) {
-                        trainFaces(); // Train images after they are loaded
-                        Log.e(TAG, "Images height: " + images.get(0).height() + " Width: " + images.get(0).width() + " total: " + images.get(0).total());
+                        Log.e(TAG, "Number of images: " + images.size() + ". Number of labels: " + imagesLabels.size());
+                        if (!images.isEmpty()) {
+                            trainFaces(); // Train images after they are loaded
+                            Log.e(TAG, "Images height: " + images.get(0).height() + " Width: " + images.get(0).width() + " total: " + images.get(0).total());
+                        }
+                        Log.e(TAG, "Labels: " + imagesLabels);
                     }
-                    Log.e(TAG, "Labels: " + imagesLabels);
 
                     break;
                 default:
                     super.onManagerConnected(status);
                     break;
             }
+        }
+    };
+
+    private NativeMethods.MeasureDistTask.Callback measureDistTaskCallback = new NativeMethods.MeasureDistTask.Callback() {
+        @Override
+        public void onMeasureDistComplete(Bundle bundle) {
+//            if (bundle == null) {
+//                showToast("Failed to measure distance", Toast.LENGTH_LONG);
+//                return;
+//            }
+//
+//            float minDist = bundle.getFloat(NativeMethods.MeasureDistTask.MIN_DIST_FLOAT);
+//            if (minDist != -1) {
+//                int minIndex = bundle.getInt(NativeMethods.MeasureDistTask.MIN_DIST_INDEX_INT);
+//                float faceDist = bundle.getFloat(NativeMethods.MeasureDistTask.DIST_FACE_FLOAT);
+//                if (imagesLabels.size() > minIndex) { // Just to be sure
+//                    Log.i(TAG, "dist[" + minIndex + "]: " + minDist + ", face dist: " + faceDist + ", label: " + imagesLabels.get(minIndex));
+//
+//                    String minDistString = String.format(Locale.US, "%.4f", minDist);
+//                    String faceDistString = String.format(Locale.US, "%.4f", faceDist);
+//
+//                    if (faceDist < faceThreshold && minDist < distanceThreshold) // 1. Near face space and near a face class
+//                        showToast("Face detected: " + imagesLabels.get(minIndex) + ". Distance: " + minDistString, Toast.LENGTH_LONG);
+//                    else if (faceDist < faceThreshold) // 2. Near face space but not near a known face class
+//                        showToast("Unknown face. Face distance: " + faceDistString + ". Closest Distance: " + minDistString, Toast.LENGTH_LONG);
+//                    else if (minDist < distanceThreshold) // 3. Distant from face space and near a face class
+//                        showToast("False recognition. Face distance: " + faceDistString + ". Closest Distance: " + minDistString, Toast.LENGTH_LONG);
+//                    else // 4. Distant from face space and not near a known face class.
+//                        showToast("Image is not a face. Face distance: " + faceDistString + ". Closest Distance: " + minDistString, Toast.LENGTH_LONG);
+//                }
+//            } else {
+//                Log.w(TAG, "Array is null");
+//                if (useEigenfaces || uniqueLabels == null || uniqueLabels.length > 1)
+//                    showToast("Keep training...", Toast.LENGTH_SHORT);
+//                else
+//                    showToast("Fisherfaces needs two different faces", Toast.LENGTH_SHORT);
+//            }
         }
     };
 
@@ -101,15 +146,54 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
         mNhanDangCameraView.setCvCameraViewListener(this);
 
         btNhanDang = (Button) findViewById(R.id.bt_nhan_dang);
-        if(isSetting) {
+        if (isSetting) {
             btNhanDang.setText("Lưu khuân mặt");
         } else {
             btNhanDang.setText("Nhận  khuân mặt");
         }
         btNhanDang.setOnClickListener(new View.OnClickListener() {
+
+            NativeMethods.MeasureDistTask mMeasureDistTask;
+
             @Override
             public void onClick(View view) {
+                if (mMeasureDistTask != null && mMeasureDistTask.getStatus() != AsyncTask.Status.FINISHED) {
+                    Log.e(TAG, "mMeasureDistTask is still running");
+                    return;
+                }
+                if (mTrainFacesTask != null && mTrainFacesTask.getStatus() != AsyncTask.Status.FINISHED) {
+                    Log.e(TAG, "mTrainFacesTask is still running");
+                    return;
+                }
 
+                Log.i(TAG, "Gray height: " + mGray.height() + " Width: " + mGray.width() + " total: " + mGray.total());
+                if (mGray.total() == 0)
+                    return;
+                Size imageSize = new Size(200, 200.0f / ((float) mGray.width() / (float) mGray.height())); // Scale image in order to decrease computation time
+                Imgproc.resize(mGray, mGray, imageSize);
+                Log.i(TAG, "Small gray height: " + mGray.height() + " Width: " + mGray.width() + " total: " + mGray.total());
+                //SaveImage(mGray);
+
+                Mat image = mGray.reshape(0, (int) mGray.total()); // Create column vector
+
+                if (isSetting) {
+                    onSetupFace(image);
+                } else {
+
+                }
+
+//                Log.i(TAG, "Vector height: " + image.height() + " Width: " + image.width() + " total: " + image.total());
+//                images.add(image); // Add current image to the array
+//
+//                if (images.size() > maximumImages) {
+//                    images.remove(0); // Remove first image
+//                    imagesLabels.remove(0); // Remove first label
+//                    Log.i(TAG, "The number of images is limited to: " + images.size());
+//                }
+//
+//                // Calculate normalized Euclidean distance
+//                mMeasureDistTask = new NativeMethods.MeasureDistTask(false, measureDistTaskCallback);
+//                mMeasureDistTask.execute(image);
             }
         });
     }
@@ -156,17 +240,69 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
 
     @Override
     public void onCameraViewStarted(int width, int height) {
-
+        mGray = new Mat();
+        mRgba = new Mat();
     }
 
     @Override
     public void onCameraViewStopped() {
-
+        mGray.release();
+        mRgba.release();
     }
 
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-        return null;
+        Mat mGrayTmp = inputFrame.gray();
+        Mat mRgbaTmp = inputFrame.rgba();
+
+        // Flip image to get mirror effect
+        int orientation = mNhanDangCameraView.getScreenOrientation();
+        if (mNhanDangCameraView.isEmulator()) // Treat emulators as a special case
+            Core.flip(mRgbaTmp, mRgbaTmp, 1); // Flip along y-axis
+        else {
+            switch (orientation) { // RGB image
+                case ActivityInfo.SCREEN_ORIENTATION_PORTRAIT:
+                case ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT:
+                    if (mNhanDangCameraView.mCameraIndex == CameraBridgeViewBase.CAMERA_ID_FRONT)
+                        Core.flip(mRgbaTmp, mRgbaTmp, 0); // Flip along x-axis
+                    else
+                        Core.flip(mRgbaTmp, mRgbaTmp, -1); // Flip along both axis
+                    break;
+                case ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE:
+                case ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE:
+                    if (mNhanDangCameraView.mCameraIndex == CameraBridgeViewBase.CAMERA_ID_FRONT)
+                        Core.flip(mRgbaTmp, mRgbaTmp, 1); // Flip along y-axis
+                    break;
+            }
+            switch (orientation) { // Grayscale image
+                case ActivityInfo.SCREEN_ORIENTATION_PORTRAIT:
+                    Core.transpose(mGrayTmp, mGrayTmp); // Rotate image
+                    if (mNhanDangCameraView.mCameraIndex == CameraBridgeViewBase.CAMERA_ID_FRONT)
+                        Core.flip(mGrayTmp, mGrayTmp, -1); // Flip along both axis
+                    else
+                        Core.flip(mGrayTmp, mGrayTmp, 1); // Flip along y-axis
+                    break;
+                case ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT:
+                    Core.transpose(mGrayTmp, mGrayTmp); // Rotate image
+                    if (mNhanDangCameraView.mCameraIndex == CameraBridgeViewBase.CAMERA_ID_BACK)
+                        Core.flip(mGrayTmp, mGrayTmp, 0); // Flip along x-axis
+                    break;
+                case ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE:
+                    if (mNhanDangCameraView.mCameraIndex == CameraBridgeViewBase.CAMERA_ID_FRONT)
+                        Core.flip(mGrayTmp, mGrayTmp, 1); // Flip along y-axis
+                    break;
+                case ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE:
+                    Core.flip(mGrayTmp, mGrayTmp, 0); // Flip along x-axis
+                    if (mNhanDangCameraView.mCameraIndex == CameraBridgeViewBase.CAMERA_ID_BACK)
+                        Core.flip(mGrayTmp, mGrayTmp, 1); // Flip along y-axis
+                    break;
+            }
+        }
+
+        mGray = mGrayTmp;
+        mRgba = mRgbaTmp;
+
+        return mRgba;
     }
 
     private void loadOpenCV() {
@@ -233,6 +369,34 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
         mTrainFacesTask.execute();
 
         return true;
+    }
+
+    // Lưu khuân mặt mới
+    private void onSetupFace(Mat image) {
+        images = new ArrayList<>();
+        images.add(image);
+
+        imagesLabels = new ArrayList<>();
+        imagesLabels.add("Admin");
+
+        tinydb.putListMat("images", images);
+        tinydb.putListString("imagesLabels", imagesLabels);
+
+        Toast.makeText(this, "Lưu khuân mặt thành công", Toast.LENGTH_SHORT).show();
+        finish();
+    }
+
+    // Xử lý nhận dạng khuân mặt
+    private void onRecognizeFace() {
+
+    }
+
+    private void addLabel(String string) {
+        String label = string.substring(0, 1).toUpperCase(Locale.US) + string.substring(1).trim().toLowerCase(Locale.US); // Make sure that the name is always uppercase and rest is lowercase
+        imagesLabels.add(label); // Add label to list of labels
+        Log.i(TAG, "Label: " + label);
+
+        trainFaces(); // When we have finished setting the label, then retrain faces
     }
 
 }

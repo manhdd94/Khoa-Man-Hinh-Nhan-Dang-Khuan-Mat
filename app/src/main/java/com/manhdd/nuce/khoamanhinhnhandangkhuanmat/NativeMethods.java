@@ -87,19 +87,19 @@ public class NativeMethods {
     }
 
     public static class MeasureDistTask extends AsyncTask<Mat, Void, Bundle> {
-        static final String MIN_DIST_FLOAT = "minDist";
-        static final String MIN_DIST_INDEX_INT = "minDistIndex";
-        static final String DIST_FACE_FLOAT = "distFace";
+        public static final String MIN_DIST_FLOAT = "minDist";
+        public static final String MIN_DIST_INDEX_INT = "minDistIndex";
+        public static final String DIST_FACE_FLOAT = "distFace";
 
         private final Callback callback;
         private final boolean useEigenfaces;
         private Exception error;
 
-        interface Callback {
+        public interface Callback {
             void onMeasureDistComplete(Bundle bundle);
         }
 
-        MeasureDistTask(boolean useEigenfaces, Callback callback) {
+        public MeasureDistTask(boolean useEigenfaces, Callback callback) {
             this.useEigenfaces = useEigenfaces;
             this.callback = callback;
         }

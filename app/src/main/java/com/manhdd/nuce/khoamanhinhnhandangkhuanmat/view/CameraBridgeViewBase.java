@@ -51,7 +51,7 @@ public abstract class CameraBridgeViewBase extends SurfaceView implements Surfac
     protected int mMaxWidth;
     protected float mScale = 0;
     protected int mPreviewFormat = RGBA;
-    protected int mCameraIndex = CAMERA_ID_ANY;
+    public int mCameraIndex = CAMERA_ID_ANY;
     protected boolean mEnabled;
     protected FpsMeter mFpsMeter = null;
 

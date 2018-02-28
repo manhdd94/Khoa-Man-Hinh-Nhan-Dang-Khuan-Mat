@@ -60,7 +60,7 @@ JNIEXPORT void JNICALL Java_com_manhdd_nuce_khoamanhinhnhandangkhuanmat_NativeMe
     //Facebase *pFacebase;
     if (pClasses == NULL) { // If classes are NULL, then train Eigenfaces
         eigenfaces.train(images); // Train Eigenfaces
-        LOGI("Eigenfacess numComponents: %d", eigenfaces.numComponents);
+        LOGE("Eigenfacess numComponents: %d", eigenfaces.numComponents);
         //pFacebase = &eigenfaces;
     } else {
         LOG_ASSERT(pClasses->type() == CV_32S && pClasses->cols == 1, "Classes must be a signed 32-bit vector");
@@ -68,7 +68,7 @@ JNIEXPORT void JNICALL Java_com_manhdd_nuce_khoamanhinhnhandangkhuanmat_NativeMe
         cv2eigen(*pClasses, classes); // Copy from OpenCV Mat to Eigen vector
         LOG_ASSERT(classes.minCoeff() == 1, "Minimum value in the list must be 1");
         fisherfaces.train(images, classes); // Train Fisherfaces
-        LOGI("Fisherfaces numComponents: %d", fisherfaces.numComponents);
+        LOGE("Fisherfaces numComponents: %d", fisherfaces.numComponents);
         //pFacebase = &fisherfaces;
     }
 
@@ -84,12 +84,13 @@ JNIEXPORT void JNICALL Java_com_manhdd_nuce_khoamanhinhnhandangkhuanmat_NativeMe
 }
 
 JNIEXPORT void JNICALL Java_com_manhdd_nuce_khoamanhinhnhandangkhuanmat_NativeMethods_MeasureDist(JNIEnv *env, jobject, jlong addrImage, jfloatArray minDist, jintArray minDistIndex, jfloatArray faceDist, jboolean useEigenfaces) {
+    LOGE("abc", "here");
     Facebase *pFacebase;
     if (useEigenfaces) {
-        LOGI("Using Eigenfaces");
+        LOGE("Using Eigenfaces");
         pFacebase = &eigenfaces;
     } else {
-        LOGI("Using Fisherfaces");
+        LOGE("Using Fisherfaces");
         pFacebase = &fisherfaces;
     }
 
@@ -99,21 +100,21 @@ JNIEXPORT void JNICALL Java_com_manhdd_nuce_khoamanhinhnhandangkhuanmat_NativeMe
         VectorXi image;
         cv2eigen(*pImage, image); // Convert from OpenCV Mat to Eigen matrix
 
-        LOGI("Project faces");
+        LOGE("Project faces");
         VectorXf W = pFacebase->project(image); // Project onto subspace
-        LOGI("Reconstructing faces");
+        LOGE("Reconstructing faces");
         VectorXf face = pFacebase->reconstructFace(W);
 
-        LOGI("Calculate normalized Euclidean distance");
+        LOGE("Calculate normalized Euclidean distance");
         jfloat dist_face = pFacebase->euclideanDistFace(image, face);
-        LOGI("Face distance: %f", dist_face);
+        LOGE("Face distance: %f", dist_face);
         env->SetFloatArrayRegion(faceDist, 0, 1, &dist_face);
 
         VectorXf dist = pFacebase->euclideanDist(W);
 
         vector<size_t> sortedIdx = sortIndexes(dist);
         for (auto idx : sortedIdx)
-            LOGI("dist[%zu]: %f", idx, dist(idx));
+            LOGE("dist[%zu]: %f", idx, dist(idx));
 
         int minIndex = (int) sortedIdx[0];
         env->SetFloatArrayRegion(minDist, 0, 1, &dist(minIndex));

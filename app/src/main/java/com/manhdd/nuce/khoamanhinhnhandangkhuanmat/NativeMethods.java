@@ -126,7 +126,7 @@ public class NativeMethods {
         protected void onPostExecute(Bundle bundle) {
             callback.onMeasureDistComplete(bundle);
             if (bundle != null)
-                Log.i(TAG, "Done measuring distance");
+                Log.e(TAG, "Done measuring distance");
             else
                 Log.e(TAG, error.getMessage());
         }

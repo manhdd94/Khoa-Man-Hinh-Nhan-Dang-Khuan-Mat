@@ -149,7 +149,7 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
         if (isSetting) {
             btNhanDang.setText("Lưu khuân mặt");
         } else {
-            btNhanDang.setText("Nhận  khuân mặt");
+            btNhanDang.setText("Nhận dạng khuân mặt");
         }
         btNhanDang.setOnClickListener(new View.OnClickListener() {
 
@@ -179,7 +179,8 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
                 if (isSetting) {
                     onSetupFace(image);
                 } else {
-
+                    mMeasureDistTask = new NativeMethods.MeasureDistTask(false, measureDistTaskCallback);
+                    mMeasureDistTask.execute(image);
                 }
 
 //                Log.i(TAG, "Vector height: " + image.height() + " Width: " + image.width() + " total: " + image.total());
@@ -387,8 +388,11 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
     }
 
     // Xử lý nhận dạng khuân mặt
-    private void onRecognizeFace() {
+    private void onRecognizeFace(Mat image, NativeMethods.MeasureDistTask mMeasureDistTask) {
+        images.add(image);
 
+        mMeasureDistTask = new NativeMethods.MeasureDistTask(false, measureDistTaskCallback);
+        mMeasureDistTask.execute(image);
     }
 
     private void addLabel(String string) {

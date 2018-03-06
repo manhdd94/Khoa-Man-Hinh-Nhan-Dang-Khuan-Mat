@@ -94,37 +94,38 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
     private NativeMethods.MeasureDistTask.Callback measureDistTaskCallback = new NativeMethods.MeasureDistTask.Callback() {
         @Override
         public void onMeasureDistComplete(Bundle bundle) {
-//            if (bundle == null) {
-//                showToast("Failed to measure distance", Toast.LENGTH_LONG);
-//                return;
-//            }
-//
-//            float minDist = bundle.getFloat(NativeMethods.MeasureDistTask.MIN_DIST_FLOAT);
-//            if (minDist != -1) {
-//                int minIndex = bundle.getInt(NativeMethods.MeasureDistTask.MIN_DIST_INDEX_INT);
-//                float faceDist = bundle.getFloat(NativeMethods.MeasureDistTask.DIST_FACE_FLOAT);
-//                if (imagesLabels.size() > minIndex) { // Just to be sure
-//                    Log.i(TAG, "dist[" + minIndex + "]: " + minDist + ", face dist: " + faceDist + ", label: " + imagesLabels.get(minIndex));
-//
-//                    String minDistString = String.format(Locale.US, "%.4f", minDist);
-//                    String faceDistString = String.format(Locale.US, "%.4f", faceDist);
-//
-//                    if (faceDist < faceThreshold && minDist < distanceThreshold) // 1. Near face space and near a face class
-//                        showToast("Face detected: " + imagesLabels.get(minIndex) + ". Distance: " + minDistString, Toast.LENGTH_LONG);
-//                    else if (faceDist < faceThreshold) // 2. Near face space but not near a known face class
-//                        showToast("Unknown face. Face distance: " + faceDistString + ". Closest Distance: " + minDistString, Toast.LENGTH_LONG);
-//                    else if (minDist < distanceThreshold) // 3. Distant from face space and near a face class
-//                        showToast("False recognition. Face distance: " + faceDistString + ". Closest Distance: " + minDistString, Toast.LENGTH_LONG);
-//                    else // 4. Distant from face space and not near a known face class.
-//                        showToast("Image is not a face. Face distance: " + faceDistString + ". Closest Distance: " + minDistString, Toast.LENGTH_LONG);
-//                }
-//            } else {
-//                Log.w(TAG, "Array is null");
-//                if (useEigenfaces || uniqueLabels == null || uniqueLabels.length > 1)
-//                    showToast("Keep training...", Toast.LENGTH_SHORT);
-//                else
-//                    showToast("Fisherfaces needs two different faces", Toast.LENGTH_SHORT);
-//            }
+            if (bundle == null) {
+                Toast.makeText(ManHinhNhanDang.this, "Mở khoá không thành công Vui lòng thử lại", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            float minDist = bundle.getFloat(NativeMethods.MeasureDistTask.MIN_DIST_FLOAT);
+            if (minDist != -1) {
+                int minIndex = bundle.getInt(NativeMethods.MeasureDistTask.MIN_DIST_INDEX_INT);
+                float faceDist = bundle.getFloat(NativeMethods.MeasureDistTask.DIST_FACE_FLOAT);
+                if (imagesLabels.size() > minIndex) { // Just to be sure
+                    Log.e(TAG, "dist[" + minIndex + "]: " + minDist + ", face dist: " + faceDist + ", label: " + imagesLabels.get(minIndex));
+
+                    String minDistString = String.format(Locale.US, "%.4f", minDist);
+                    String faceDistString = String.format(Locale.US, "%.4f", faceDist);
+
+                    if (faceDist < 0.5f && minDist < 0.5f) { // 1. Near face space and near a face class
+                        Toast.makeText(ManHinhNhanDang.this, "Face detected: " + imagesLabels.get(minIndex) + ". Distance: " + minDistString, Toast.LENGTH_LONG).show();
+                        moKhoa();
+                    } else if (faceDist < 0.5f) { // 2. Near face space but not near a known face class
+                        Toast.makeText(ManHinhNhanDang.this, "Mở khoá không thành công Vui lòng thử lại", Toast.LENGTH_LONG).show();
+                        Log.e("Recognize failed", "Unknown face. Face distance: " + faceDistString + ". Closest Distance: " + minDistString);
+                    } else if (minDist < 0.5f) { // 3. Distant from face space and near a face class
+                        Toast.makeText(ManHinhNhanDang.this, "Mở khoá không thành công Vui lòng thử lại", Toast.LENGTH_LONG).show();
+                        Log.e("Recognize failed", "False recognition. Face distance: " + faceDistString + ". Closest Distance: " + minDistString);
+                    } else { // 4. Distant from face space and not near a known face class.
+                        Toast.makeText(ManHinhNhanDang.this, "Mở khoá không thành công Vui lòng thử lại", Toast.LENGTH_LONG).show();
+                        Log.e("Recognize failed", "Image is not a face. Face distance: " + faceDistString + ". Closest Distance: " + minDistString);
+                    }
+                }
+            } else {
+                Log.e(TAG, "Min dist=" + minDist);
+            }
         }
     };
 
@@ -149,7 +150,7 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
         if (isSetting) {
             btNhanDang.setText("Lưu khuân mặt");
         } else {
-            btNhanDang.setText("Nhận dạng khuân mặt");
+            btNhanDang.setText("Mở khoá");
         }
         btNhanDang.setOnClickListener(new View.OnClickListener() {
 
@@ -179,22 +180,8 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
                 if (isSetting) {
                     onSetupFace(image);
                 } else {
-                    mMeasureDistTask = new NativeMethods.MeasureDistTask(false, measureDistTaskCallback);
-                    mMeasureDistTask.execute(image);
+                    onRecognizeFace(image, mMeasureDistTask);
                 }
-
-//                Log.i(TAG, "Vector height: " + image.height() + " Width: " + image.width() + " total: " + image.total());
-//                images.add(image); // Add current image to the array
-//
-//                if (images.size() > maximumImages) {
-//                    images.remove(0); // Remove first image
-//                    imagesLabels.remove(0); // Remove first label
-//                    Log.i(TAG, "The number of images is limited to: " + images.size());
-//                }
-//
-//                // Calculate normalized Euclidean distance
-//                mMeasureDistTask = new NativeMethods.MeasureDistTask(false, measureDistTaskCallback);
-//                mMeasureDistTask.execute(image);
             }
         });
     }
@@ -374,33 +361,37 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
 
     // Lưu khuân mặt mới
     private void onSetupFace(Mat image) {
-        images = new ArrayList<>();
+        if(images == null) {
+            images = new ArrayList<>();
+        }
         images.add(image);
 
-        imagesLabels = new ArrayList<>();
-        imagesLabels.add("Admin");
+        if(imagesLabels == null) {
+            imagesLabels = new ArrayList<>();
+        }
 
-        tinydb.putListMat("images", images);
-        tinydb.putListString("imagesLabels", imagesLabels);
+        if(images.size() == 3) {
+            imagesLabels.add("Admin_2");
+            tinydb.putListMat("images", images);
+            tinydb.putListString("imagesLabels", imagesLabels);
 
-        Toast.makeText(this, "Lưu khuân mặt thành công", Toast.LENGTH_SHORT).show();
-        finish();
+            Toast.makeText(this, "Lưu khuân mặt thành công", Toast.LENGTH_SHORT).show();
+            finish();
+        } else {
+            imagesLabels.add("Admin_" + images.size());
+
+            Toast.makeText(this, "Chụp lại một lần nữa", Toast.LENGTH_SHORT).show();
+        }
     }
 
     // Xử lý nhận dạng khuân mặt
     private void onRecognizeFace(Mat image, NativeMethods.MeasureDistTask mMeasureDistTask) {
-        images.add(image);
-
         mMeasureDistTask = new NativeMethods.MeasureDistTask(false, measureDistTaskCallback);
         mMeasureDistTask.execute(image);
     }
 
-    private void addLabel(String string) {
-        String label = string.substring(0, 1).toUpperCase(Locale.US) + string.substring(1).trim().toLowerCase(Locale.US); // Make sure that the name is always uppercase and rest is lowercase
-        imagesLabels.add(label); // Add label to list of labels
-        Log.i(TAG, "Label: " + label);
-
-        trainFaces(); // When we have finished setting the label, then retrain faces
+    private void moKhoa() {
+        finishAffinity();
     }
 
 }

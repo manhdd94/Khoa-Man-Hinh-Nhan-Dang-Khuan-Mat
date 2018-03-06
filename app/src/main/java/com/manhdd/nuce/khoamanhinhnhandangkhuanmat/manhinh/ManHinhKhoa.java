@@ -35,6 +35,11 @@ public class ManHinhKhoa extends AppCompatActivity {
         });
     }
 
+    @Override
+    public void onBackPressed() {
+        
+    }
+
     public void taoManHinhFullScreen() {
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -50,10 +55,6 @@ public class ManHinhKhoa extends AppCompatActivity {
                             | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
                             | View.SYSTEM_UI_FLAG_IMMERSIVE);
         }
-    }
-
-    public void moKhoa(View view) {
-        android.os.Process.killProcess(android.os.Process.myPid());
     }
 
 }

@@ -8,7 +8,7 @@
         android:id="@+id/iv_hinh_nen"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/anh_man_hinh_khoa"/>
+        android:background="@drawable/anh_man_hinh_khoa1"/>
 
     <ImageView
         android:id="@+id/iv_nhan_dang_khuan_mat"

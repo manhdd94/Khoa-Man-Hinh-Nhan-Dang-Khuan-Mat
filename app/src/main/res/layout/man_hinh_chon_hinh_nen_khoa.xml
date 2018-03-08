@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <com.manhdd.nuce.khoamanhinhnhandangkhuanmat.chung.CustomButton
+        android:id="@+id/bt_luu_hinh_nen"
+        android:layout_width="wrap_content"
+        android:layout_height="56dp"
+        android:background="@drawable/background_button"
+        android:textAllCaps="false"
+        android:text="Lưu Hình Nền"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_list_hinh_nen"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/bt_luu_hinh_nen"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"></android.support.v7.widget.RecyclerView>
+
+    <ImageView
+        android:id="@+id/iv_hinh_nen_khoa"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="10dp"
+        android:scaleType="fitCenter"
+        android:layout_above="@+id/rv_list_hinh_nen"
+        android:src="@drawable/anh_man_hinh_khoa1"/>
+
+</RelativeLayout>

@@ -25,7 +25,7 @@ public class ManHinhCaiDat extends AppCompatActivity {
 
         mIntent = new Intent(this, DichVuManHinhKhoa.class);
 
-        if(sharedPreferences.getBoolean("is_first_run", true)) {
+        if (sharedPreferences.getBoolean("is_first_run", true)) {
             startService(mIntent);
         }
 
@@ -51,13 +51,22 @@ public class ManHinhCaiDat extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 boolean enable = swSuDungManHinhKhoa.isChecked();
-                if(enable) {
+                if (enable) {
                     stopService(mIntent);
                 } else {
                     startService(mIntent);
                 }
                 swSuDungManHinhKhoa.setChecked(!enable);
                 sharedPreferences.edit().putBoolean("is_enable", !enable).commit();
+            }
+        });
+
+        TextView tvCaiDatHinhNen = (TextView) findViewById(R.id.tv_cai_dat_hinh_nen);
+        tvCaiDatHinhNen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(ManHinhCaiDat.this, ManHinhChonHinhNenKhoa.class);
+                startActivity(intent);
             }
         });
     }

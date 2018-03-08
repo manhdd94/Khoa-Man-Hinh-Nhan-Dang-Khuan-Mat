@@ -37,7 +37,7 @@ public class ManHinhKhoa extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        
+
     }
 
     public void taoManHinhFullScreen() {

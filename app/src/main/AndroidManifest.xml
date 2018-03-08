@@ -47,6 +47,11 @@
         <activity android:name=".manhinh.ManHinhNhanDang"
                   android:theme="@style/Theme.AppCompat.NoActionBar">
         </activity>
+
+        <activity android:name=".manhinh.ManHinhChonHinhNenKhoa"
+                  android:theme="@style/Theme.AppCompat.NoActionBar">
+        </activity>
+
     </application>
 
 </manifest>

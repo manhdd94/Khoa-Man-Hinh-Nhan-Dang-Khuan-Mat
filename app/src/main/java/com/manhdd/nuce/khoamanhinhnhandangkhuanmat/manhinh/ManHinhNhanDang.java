@@ -1,9 +1,12 @@
 package com.manhdd.nuce.khoamanhinhnhandangkhuanmat.manhinh;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.graphics.PixelFormat;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -14,6 +17,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.manhdd.nuce.khoamanhinhnhandangkhuanmat.NativeMethods;
@@ -40,6 +44,10 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
     private static final String TAG = ManHinhNhanDang.class.getSimpleName();
     private static final int PERMISSIONS_REQUEST_CODE = 3232;
 
+    public WindowManager winManager;
+    public RelativeLayout wrapperView;
+
+    private View rootView;
     private CameraBridgeViewBase mNhanDangCameraView;
     private Button btNhanDang;
 
@@ -110,7 +118,7 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
                     String faceDistString = String.format(Locale.US, "%.4f", faceDist);
 
                     if (faceDist < 0.5f && minDist < 0.5f) { // 1. Near face space and near a face class
-                        Toast.makeText(ManHinhNhanDang.this, "Face detected: " + imagesLabels.get(minIndex) + ". Distance: " + minDistString, Toast.LENGTH_LONG).show();
+//                        Toast.makeText(ManHinhNhanDang.this, "Face detected: " + imagesLabels.get(minIndex) + ". Distance: " + minDistString, Toast.LENGTH_LONG).show();
                         moKhoa();
                     } else if (faceDist < 0.5f) { // 2. Near face space but not near a known face class
                         Toast.makeText(ManHinhNhanDang.this, "Mở khoá không thành công Vui lòng thử lại", Toast.LENGTH_LONG).show();
@@ -135,18 +143,41 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        setContentView(R.layout.man_hinh_nhan_dang);
+//        setContentView(R.layout.man_hinh_nhan_dang);
+
+        WindowManager.LayoutParams localLayoutParams = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            localLayoutParams = new WindowManager.LayoutParams(
+                    WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                            | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+                            | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
+                    PixelFormat.TRANSLUCENT);
+        } else {
+            localLayoutParams = new WindowManager.LayoutParams(
+                    WindowManager.LayoutParams.TYPE_SYSTEM_ERROR,
+                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                            | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+                            | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
+                    PixelFormat.TRANSLUCENT);
+        }
+        this.winManager = ((WindowManager) getApplicationContext()
+                .getSystemService(WINDOW_SERVICE));
+        this.wrapperView = new RelativeLayout(getBaseContext());
+        getWindow().setAttributes(localLayoutParams);
+        rootView = View.inflate(this, R.layout.man_hinh_nhan_dang, this.wrapperView);
+        this.winManager.addView(this.wrapperView, localLayoutParams);
 
         isSetting = getIntent().getBooleanExtra("is_setting", true);
 
         tinydb = new TinyDB(this);
 
-        mNhanDangCameraView = (CameraBridgeViewBase) findViewById(R.id.camera_view);
+        mNhanDangCameraView = (CameraBridgeViewBase) rootView.findViewById(R.id.camera_view);
         mNhanDangCameraView.setCameraIndex(CameraBridgeViewBase.CAMERA_ID_FRONT);
         mNhanDangCameraView.setVisibility(SurfaceView.VISIBLE);
         mNhanDangCameraView.setCvCameraViewListener(this);
 
-        btNhanDang = (Button) findViewById(R.id.bt_nhan_dang);
+        btNhanDang = (Button) rootView.findViewById(R.id.bt_nhan_dang);
         if (isSetting) {
             btNhanDang.setText("Lưu khuân mặt");
         } else {
@@ -187,6 +218,17 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
     }
 
     @Override
+    public void onBackPressed() {
+        if(isSetting) {
+            super.onBackPressed();
+        } else {
+            Intent i = new Intent(this, ManHinhKhoa.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startActivity(i);
+        }
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
 
@@ -207,6 +249,8 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
 
     @Override
     public void onDestroy() {
+        this.winManager.removeView(this.wrapperView);
+        this.wrapperView.removeAllViews();
         super.onDestroy();
         if (mNhanDangCameraView != null)
             mNhanDangCameraView.disableView();

@@ -2,13 +2,40 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
     <ImageView
         android:id="@+id/iv_hinh_nen"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/anh_man_hinh_khoa1"/>
+        android:layout_height="match_parent"/>
+
+    <TextView
+        android:id="@+id/tv_gio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="60dp"
+        android:textSize="70sp"
+        android:textColor="#ffffff"/>
+
+    <TextView
+        android:id="@+id/tv_phut"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/tv_gio"
+        android:textSize="70sp"
+        android:textColor="#ffffff"/>
+
+    <TextView
+        android:id="@+id/tv_ngay_thang"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/tv_phut"
+        android:textSize="16sp"
+        android:textColor="#ffffff"/>
 
     <ImageView
         android:id="@+id/iv_nhan_dang_khuan_mat"

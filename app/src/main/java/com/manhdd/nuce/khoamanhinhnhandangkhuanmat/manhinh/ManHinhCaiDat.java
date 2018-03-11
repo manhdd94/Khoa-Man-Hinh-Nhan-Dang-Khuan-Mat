@@ -81,19 +81,13 @@ public class ManHinhCaiDat extends AppCompatActivity {
     }
 
     private void hienThiYeuCauCaiDatKhuanMat() {
-        AlertDialog.Builder builder;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);
-        } else {
-            builder = new AlertDialog.Builder(this);
-        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Bạn cần cài đặt khuân mặt để sử dụng màn hình khoá")
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         moManHinhCaiDatKhuanMat();
                     }
                 })
-                .setIcon(android.R.drawable.ic_dialog_alert)
                 .setCancelable(false)
                 .show();
     }

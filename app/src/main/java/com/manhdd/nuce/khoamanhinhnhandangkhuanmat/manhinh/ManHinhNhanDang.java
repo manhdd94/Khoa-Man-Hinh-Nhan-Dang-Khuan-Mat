@@ -2,6 +2,7 @@ package com.manhdd.nuce.khoamanhinhnhandangkhuanmat.manhinh;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -18,6 +19,7 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.SurfaceView;
@@ -69,6 +71,7 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
     private NativeMethods.TrainFacesTask mTrainFacesTask;
     private String[] uniqueLabels;
     private boolean isSetting;
+    private SharedPreferences sharedPreferences;
 
     private Handler disconnectHandler = new Handler(){
         public void handleMessage(Message msg) {
@@ -167,6 +170,8 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+        sharedPreferences = getSharedPreferences("KhoaManHinhNhanDangKhuanMat", Context.MODE_PRIVATE);
+
         isSetting = getIntent().getBooleanExtra("is_setting", true);
 
         if(isSetting) {
@@ -258,6 +263,10 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
                 }
             }
         });
+
+        if (sharedPreferences.getBoolean("is_first_run", true)) {
+            hienThiHuongDan();
+        }
     }
 
     @Override
@@ -469,7 +478,6 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
             tinydb.putListMat("images", images);
             tinydb.putListString("imagesLabels", imagesLabels);
 
-            SharedPreferences sharedPreferences = getSharedPreferences("KhoaManHinhNhanDangKhuanMat", Context.MODE_PRIVATE);
             if (sharedPreferences.getBoolean("is_first_run", true)) {
                 Intent intent = new Intent(this, DichVuManHinhKhoa.class);
                 startService(intent);
@@ -502,6 +510,18 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
 
     public void stopDisconnectTimer(){
         disconnectHandler.removeCallbacks(disconnectCallback);
+    }
+
+    private void hienThiHuongDan() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Hướng dẫn")
+                .setMessage("Bạn cần lưu khuân mặt ở 3 góc khác nhau")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                })
+                .show();
     }
 
 }

@@ -17,7 +17,8 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="60dp"
         android:textSize="70sp"
-        android:textColor="#ffffff"/>
+        android:textColor="#ffffff"
+        android:includeFontPadding="false"/>
 
     <TextView
         android:id="@+id/tv_phut"
@@ -26,7 +27,8 @@
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/tv_gio"
         android:textSize="70sp"
-        android:textColor="#ffffff"/>
+        android:textColor="#ffffff"
+        android:includeFontPadding="false"/>
 
     <TextView
         android:id="@+id/tv_ngay_thang"

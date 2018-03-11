@@ -1,12 +1,14 @@
 package com.manhdd.nuce.khoamanhinhnhandangkhuanmat.manhinh;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -29,7 +31,7 @@ public class ManHinhCaiDat extends AppCompatActivity {
         mIntent = new Intent(this, DichVuManHinhKhoa.class);
 
         if (sharedPreferences.getBoolean("is_first_run", true)) {
-            startService(mIntent);
+            hienThiYeuCauCaiDatKhuanMat();
         }
 
         setContentView(R.layout.man_hinh_cai_dat);
@@ -38,10 +40,7 @@ public class ManHinhCaiDat extends AppCompatActivity {
         tvCaiDatKhuanMat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(ManHinhCaiDat.this, ManHinhNhanDang.class);
-                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                i.putExtra("is_setting", true);
-                startActivity(i);
+                moManHinhCaiDatKhuanMat();
             }
         });
 
@@ -60,7 +59,7 @@ public class ManHinhCaiDat extends AppCompatActivity {
                     startService(mIntent);
                 }
                 swSuDungManHinhKhoa.setChecked(!enable);
-                sharedPreferences.edit().putBoolean("is_enable", !enable).commit();
+                sharedPreferences.edit().putBoolean("is_enable", !enable).apply();
             }
         });
 
@@ -79,6 +78,31 @@ public class ManHinhCaiDat extends AppCompatActivity {
                 startActivityForResult(intent, 3344);
             }
         }
+    }
+
+    private void hienThiYeuCauCaiDatKhuanMat() {
+        AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);
+        } else {
+            builder = new AlertDialog.Builder(this);
+        }
+        builder.setMessage("Bạn cần cài đặt khuân mặt để sử dụng màn hình khoá")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        moManHinhCaiDatKhuanMat();
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setCancelable(false)
+                .show();
+    }
+
+    private void moManHinhCaiDatKhuanMat() {
+        Intent i = new Intent(ManHinhCaiDat.this, ManHinhNhanDang.class);
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        i.putExtra("is_setting", true);
+        startActivity(i);
     }
 
 }

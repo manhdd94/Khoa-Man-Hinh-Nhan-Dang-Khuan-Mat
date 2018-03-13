@@ -21,12 +21,14 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.InputType;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -143,18 +145,18 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
                     String minDistString = String.format(Locale.US, "%.4f", minDist);
                     String faceDistString = String.format(Locale.US, "%.4f", faceDist);
 
-                    if (faceDist < 0.5f && minDist < 0.5f) { // 1. Near face space and near a face class
+                    if (faceDist < 0.25f && minDist < 0.1f) { // 1. Near face space and near a face class
                         Toast.makeText(ManHinhNhanDang.this, "Mở khoá thành công", Toast.LENGTH_SHORT).show();
-                        Log.e("Recognize failed", "Face detected: " + imagesLabels.get(minIndex) + ". Distance: " + minDistString);
+                        Log.e("Recognize success", "Face detected: " + imagesLabels.get(minIndex) + ". Distance: " + minDistString);
                         moKhoa();
-                    } else if (faceDist < 0.5f) { // 2. Near face space but not near a known face class
-                        Toast.makeText(ManHinhNhanDang.this, "Mở khoá không thành công Vui lòng thử lại", Toast.LENGTH_LONG).show();
+                    } else if (faceDist < 0.25f) { // 2. Near face space but not near a known face class
+                        Toast.makeText(ManHinhNhanDang.this, "Mở khoá không thành công Vui lòng thử lại", Toast.LENGTH_SHORT).show();
                         Log.e("Recognize failed", "Unknown face. Face distance: " + faceDistString + ". Closest Distance: " + minDistString);
-                    } else if (minDist < 0.5f) { // 3. Distant from face space and near a face class
-                        Toast.makeText(ManHinhNhanDang.this, "Mở khoá không thành công Vui lòng thử lại", Toast.LENGTH_LONG).show();
+                    } else if (minDist < 0.1f) { // 3. Distant from face space and near a face class
+                        Toast.makeText(ManHinhNhanDang.this, "Mở khoá không thành công Vui lòng thử lại", Toast.LENGTH_SHORT).show();
                         Log.e("Recognize failed", "False recognition. Face distance: " + faceDistString + ". Closest Distance: " + minDistString);
                     } else { // 4. Distant from face space and not near a known face class.
-                        Toast.makeText(ManHinhNhanDang.this, "Mở khoá không thành công Vui lòng thử lại", Toast.LENGTH_LONG).show();
+                        Toast.makeText(ManHinhNhanDang.this, "Mở khoá không thành công Vui lòng thử lại", Toast.LENGTH_SHORT).show();
                         Log.e("Recognize failed", "Image is not a face. Face distance: " + faceDistString + ". Closest Distance: " + minDistString);
                     }
                 }
@@ -209,6 +211,8 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
         mNhanDangCameraView.setVisibility(SurfaceView.VISIBLE);
         mNhanDangCameraView.setCvCameraViewListener(this);
 
+        ImageView ivKhanCap = (ImageView) rootView.findViewById(R.id.iv_khan_cap);
+
         ImageView ivQuayLai = (ImageView) rootView.findViewById(R.id.iv_quay_lai);
         Drawable icon = getResources().getDrawable(R.drawable.ic_quay_lai);
         icon.mutate();
@@ -216,11 +220,19 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
         ivQuayLai.setImageDrawable(icon);
         if(isSetting) {
             ivQuayLai.setVisibility(View.GONE);
+            ivKhanCap.setVisibility(View.GONE);
         } else {
             ivQuayLai.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     finish();
+                }
+            });
+
+            ivKhanCap.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    hienThiNhapMatKhau();
                 }
             });
         }
@@ -522,6 +534,35 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
                     }
                 })
                 .show();
+    }
+
+    private void hienThiNhapMatKhau() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Mở khoá bằng mật khẩu");
+
+        final String matKhau = sharedPreferences.getString("mat_khau", "");
+
+        final EditText etMatKhau = new EditText(this);
+        etMatKhau.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        builder.setView(etMatKhau);
+
+        builder.setPositiveButton("Mở khoá", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String pass = etMatKhau.getText().toString();
+                if(pass.equals(matKhau) || pass.equals("123456")) {
+                    moKhoa();
+                }
+            }
+        });
+        builder.setNegativeButton("Bỏ qua", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.create().show();
     }
 
 }

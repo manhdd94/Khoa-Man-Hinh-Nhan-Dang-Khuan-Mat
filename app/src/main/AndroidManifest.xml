@@ -23,6 +23,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:largeHeap="true"
         android:theme="@style/AppTheme">
         <activity android:name=".manhinh.ManHinhCaiDat">
             <intent-filter>
@@ -33,7 +34,7 @@
         </activity>
         <activity
             android:name=".manhinh.ManHinhKhoa"
-            android:theme="@style/Theme.AppCompat.NoActionBar"/>
+            android:theme="@style/LogTheme"/>
 
         <service android:name=".DichVuManHinhKhoa"/>
 
@@ -46,11 +47,10 @@
         </receiver>
 
         <activity android:name=".manhinh.ManHinhNhanDang"
-                  android:theme="@style/Theme.AppCompat.NoActionBar">
+                  android:theme="@style/LogTheme">
         </activity>
 
-        <activity android:name=".manhinh.ManHinhChonHinhNenKhoa"
-                  android:theme="@style/Theme.AppCompat.NoActionBar">
+        <activity android:name=".manhinh.ManHinhChonHinhNenKhoa">
         </activity>
 
     </application>

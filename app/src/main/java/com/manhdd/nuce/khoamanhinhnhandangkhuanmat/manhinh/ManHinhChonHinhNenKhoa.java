@@ -51,7 +51,7 @@ public class ManHinhChonHinhNenKhoa extends AppCompatActivity {
         rvListHinhNen.setAdapter(adapter);
 
         btLuuHinhNen = (CustomButton) findViewById(R.id.bt_luu_hinh_nen);
-        btLuuHinhNen.changeBackgroundColor(Color.parseColor("#ea5721"));
+        btLuuHinhNen.changeBackgroundColor(Color.parseColor("#FFA500"));
         btLuuHinhNen.setTextColor(Color.WHITE);
         btLuuHinhNen.setOnClickListener(new View.OnClickListener() {
             @Override

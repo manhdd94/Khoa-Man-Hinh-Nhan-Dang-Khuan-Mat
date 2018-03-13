@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+    android:padding="15dp"
+    android:background="#ffffff">
+
+    <android.support.v7.widget.AppCompatEditText
+        android:id="@+id/et_mat_khau_cu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:textSize="16sp"
+        android:textColor="#000000"
+        android:hint="Mật khẩu"/>
+
+    <android.support.v7.widget.AppCompatEditText
+        android:id="@+id/et_mat_khau_moi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:layout_marginTop="10dp"
+        android:textSize="16sp"
+        android:textColor="#000000"
+        android:hint="Mật khẩu mới"/>
+
+    <android.support.v7.widget.AppCompatEditText
+        android:id="@+id/et_xac_nhan_mat_khau_moi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:layout_marginTop="10dp"
+        android:textSize="16sp"
+        android:textColor="#000000"
+        android:hint="Nhập lại mật khẩu "/>
+
+</LinearLayout>

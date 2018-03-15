@@ -1,10 +1,12 @@
 package com.manhdd.nuce.khoamanhinhnhandangkhuanmat.manhinh;
 
 import android.app.ActivityManager;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,7 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatEditText;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
+import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -22,11 +24,13 @@ import android.widget.Toast;
 
 import com.manhdd.nuce.khoamanhinhnhandangkhuanmat.DichVuManHinhKhoa;
 import com.manhdd.nuce.khoamanhinhnhandangkhuanmat.R;
+import com.manhdd.nuce.khoamanhinhnhandangkhuanmat.chung.CustomButton;
 
 public class ManHinhCaiDat extends AppCompatActivity {
 
     private Intent mIntent;
     private SharedPreferences sharedPreferences;
+    private int mStep;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +58,7 @@ public class ManHinhCaiDat extends AppCompatActivity {
         final boolean isEnable = sharedPreferences.getBoolean("is_enable", true);
         swSuDungManHinhKhoa.setChecked(isEnable);
 
-        if(isEnable && !sharedPreferences.getBoolean("is_first_run", true) && !isMyServiceRunning(DichVuManHinhKhoa.class)) {
+        if (isEnable && !sharedPreferences.getBoolean("is_first_run", true) && !isMyServiceRunning(DichVuManHinhKhoa.class)) {
             startService(mIntent);
         }
 
@@ -118,74 +122,163 @@ public class ManHinhCaiDat extends AppCompatActivity {
     }
 
     private void hienThiCaiDatMatMa() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setCancelable(false);
-        builder.setTitle("Cài đặt mật khẩu dùng trong trường hợp khẩn cấp");
+        final Dialog dialog = new Dialog(this);
+        dialog.setCancelable(true);
+        dialog.setTitle("Cài đặt mật khẩu dùng trong trường hợp khẩn cấp");
 
         LayoutInflater inflater = LayoutInflater.from(this);
         View view = inflater.inflate(R.layout.dialog_cai_dat_mat_ma, null);
-        builder.setView(view);
+        dialog.setContentView(view);
+
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        lp.copyFrom(dialog.getWindow().getAttributes());
+        lp.width = getResources().getDisplayMetrics().widthPixels;
+        dialog.getWindow().setAttributes(lp);
 
         final String matKhauCuDaLuu = sharedPreferences.getString("mat_khau", "");
 
-        final AppCompatEditText etMatKhauCu = (AppCompatEditText) view.findViewById(R.id.et_mat_khau_cu);
-        final AppCompatEditText etMatKhauMoi = (AppCompatEditText) view.findViewById(R.id.et_mat_khau_moi);
-        final AppCompatEditText etXacNhanMatKhauMoi = (AppCompatEditText) view.findViewById(R.id.et_xac_nhan_mat_khau_moi);
-
-        if(matKhauCuDaLuu.equals("")) {
-            etMatKhauCu.setVisibility(View.GONE);
+        final TextView tvMatKhau = (TextView) view.findViewById(R.id.tv_nhap_mat_khau);
+        if (!matKhauCuDaLuu.equals("")) {
+            tvMatKhau.setText("Nhập mật khẩu cũ");
+            mStep = 1;
+        } else {
+            tvMatKhau.setText("Nhập mật khẩu mới");
+            mStep = 2;
         }
 
-        builder.setPositiveButton("Lưu", null);
+        final AppCompatEditText etMatKhau = (AppCompatEditText) view.findViewById(R.id.et_mat_khau);
 
-        builder.setNegativeButton("Bỏ qua", new DialogInterface.OnClickListener() {
+        view.findViewById(R.id.tv_so_1).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
+            public void onClick(View view) {
+                etMatKhau.setText(etMatKhau.getText().insert(etMatKhau.getSelectionEnd(), "1"));
+                etMatKhau.setSelection(etMatKhau.getText().length());
             }
         });
 
-        AlertDialog dialog = builder.create();
-        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+        view.findViewById(R.id.tv_so_2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                etMatKhau.setText(etMatKhau.getText().insert(etMatKhau.getSelectionEnd(), "2"));
+                etMatKhau.setSelection(etMatKhau.getText().length());
+            }
+        });
+
+        view.findViewById(R.id.tv_so_3).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                etMatKhau.setText(etMatKhau.getText().insert(etMatKhau.getSelectionEnd(), "3"));
+                etMatKhau.setSelection(etMatKhau.getText().length());
+            }
+        });
+
+        view.findViewById(R.id.tv_so_4).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                etMatKhau.setText(etMatKhau.getText().insert(etMatKhau.getSelectionEnd(), "4"));
+                etMatKhau.setSelection(etMatKhau.getText().length());
+            }
+        });
+
+        view.findViewById(R.id.tv_so_5).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                etMatKhau.setText(etMatKhau.getText().insert(etMatKhau.getSelectionEnd(), "5"));
+                etMatKhau.setSelection(etMatKhau.getText().length());
+            }
+        });
+
+        view.findViewById(R.id.tv_so_6).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                etMatKhau.setText(etMatKhau.getText().insert(etMatKhau.getSelectionEnd(), "6"));
+                etMatKhau.setSelection(etMatKhau.getText().length());
+            }
+        });
+
+        view.findViewById(R.id.tv_so_7).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                etMatKhau.setText(etMatKhau.getText().insert(etMatKhau.getSelectionEnd(), "7"));
+                etMatKhau.setSelection(etMatKhau.getText().length());
+            }
+        });
+
+        view.findViewById(R.id.tv_so_8).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                etMatKhau.setText(etMatKhau.getText().insert(etMatKhau.getSelectionEnd(), "8"));
+                etMatKhau.setSelection(etMatKhau.getText().length());
+            }
+        });
+
+        view.findViewById(R.id.tv_so_9).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                etMatKhau.setText(etMatKhau.getText().insert(etMatKhau.getSelectionEnd(), "9"));
+                etMatKhau.setSelection(etMatKhau.getText().length());
+            }
+        });
+
+        view.findViewById(R.id.tv_so_0).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                etMatKhau.setText(etMatKhau.getText().insert(etMatKhau.getSelectionEnd(), "0"));
+                etMatKhau.setSelection(etMatKhau.getText().length());
+            }
+        });
+
+        view.findViewById(R.id.rl_xoa).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String pass = etMatKhau.getText().toString();
+                if (pass.length() > 0) {
+                    etMatKhau.setText(pass.substring(0, pass.length() - 1));
+                }
+            }
+        });
+
+        CustomButton btLuu = (CustomButton) view.findViewById(R.id.bt_luu);
+        btLuu.changeBackgroundColor(Color.parseColor("#FFA500"));
+        btLuu.setTextColor(Color.WHITE);
+        btLuu.setText("Tiếp tục");
+        btLuu.setOnClickListener(new View.OnClickListener() {
+
+            String matKhauMoi = "";
 
             @Override
-            public void onShow(final DialogInterface dialog) {
-                Button b = ((AlertDialog)dialog).getButton(AlertDialog.BUTTON_POSITIVE);
-                b.setOnClickListener(new View.OnClickListener() {
-
-                    @Override
-                    public void onClick(View view) {
-                        if(etMatKhauCu.getVisibility() == View.VISIBLE) {
-                            String matKhauCu = etMatKhauCu.getText().toString();
-                            if(matKhauCu.equals("")) {
-                                Toast.makeText(ManHinhCaiDat.this, "Vui lòng nhập mật khẩu cũ", Toast.LENGTH_SHORT).show();
-                                return;
-                            }
-                            if(!matKhauCu.equals(matKhauCuDaLuu)) {
-                                Toast.makeText(ManHinhCaiDat.this, "Mật khẩu cũ không đúng", Toast.LENGTH_SHORT).show();
-                                return;
-                            }
-                        }
-
-                        String matKhauMoi = etMatKhauMoi.getText().toString();
-                        String xacNhanMatKhauMoi = etXacNhanMatKhauMoi.getText().toString();
-
-                        if(matKhauMoi.equals("")) {
-                            Toast.makeText(ManHinhCaiDat.this, "Vui lòng nhập mật khẩu mới", Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-
-                        if(!xacNhanMatKhauMoi.equals(matKhauMoi)) {
-                            Toast.makeText(ManHinhCaiDat.this, "Xác nhận mật khẩu không khớp", Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-
-                        sharedPreferences.edit().putString("mat_khau", matKhauMoi).apply();
-                        dialog.dismiss();
+            public void onClick(View view) {
+                if (mStep == 1) {
+                    String pass = etMatKhau.getText().toString();
+                    if (pass.equals(matKhauCuDaLuu)) {
+                        mStep = 2;
+                        tvMatKhau.setText("Nhập mật khẩu mới");
+                        etMatKhau.setText("");
+                    } else {
+                        Toast.makeText(ManHinhCaiDat.this, "Mật khẩu không chính xác", Toast.LENGTH_SHORT).show();
                     }
-                });
+                } else if (mStep == 2) {
+                    String pass = etMatKhau.getText().toString();
+                    if (!pass.equals("")) {
+                        matKhauMoi = pass;
+                        mStep = 3;
+                        tvMatKhau.setText("Xác nhận mật khẩu mới");
+                        etMatKhau.setText("");
+                    } else {
+                        Toast.makeText(ManHinhCaiDat.this, "Vui lòng nhập mật khẩu mới", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    String pass = etMatKhau.getText().toString();
+                    if (pass.equals(matKhauMoi)) {
+                        sharedPreferences.edit().putString("mat_khau", pass).apply();
+                        dialog.dismiss();
+                    } else {
+                        Toast.makeText(ManHinhCaiDat.this, "Vui lòng xác nhận mật khẩu mới", Toast.LENGTH_SHORT).show();
+                    }
+                }
             }
         });
+
         dialog.show();
     }
 

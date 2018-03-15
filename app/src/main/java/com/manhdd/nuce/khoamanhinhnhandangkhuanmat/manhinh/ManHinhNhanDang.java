@@ -21,14 +21,12 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.text.InputType;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -232,7 +230,7 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
             ivKhanCap.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    hienThiNhapMatKhau();
+
                 }
             });
         }
@@ -534,35 +532,6 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
                     }
                 })
                 .show();
-    }
-
-    private void hienThiNhapMatKhau() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Mở khoá bằng mật khẩu");
-
-        final String matKhau = sharedPreferences.getString("mat_khau", "");
-
-        final EditText etMatKhau = new EditText(this);
-        etMatKhau.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        builder.setView(etMatKhau);
-
-        builder.setPositiveButton("Mở khoá", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String pass = etMatKhau.getText().toString();
-                if(pass.equals(matKhau) || pass.equals("123456")) {
-                    moKhoa();
-                }
-            }
-        });
-        builder.setNegativeButton("Bỏ qua", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-
-        builder.create().show();
     }
 
 }

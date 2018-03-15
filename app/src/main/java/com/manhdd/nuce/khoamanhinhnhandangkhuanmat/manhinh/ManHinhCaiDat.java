@@ -46,6 +46,8 @@ public class ManHinhCaiDat extends AppCompatActivity {
 
         setContentView(R.layout.man_hinh_cai_dat);
 
+        getSupportActionBar().setTitle("Cài đặt màn hình khoá");
+
         TextView tvCaiDatKhuanMat = (TextView) findViewById(R.id.tv_cai_dat_khuan_mat);
         tvCaiDatKhuanMat.setOnClickListener(new View.OnClickListener() {
             @Override

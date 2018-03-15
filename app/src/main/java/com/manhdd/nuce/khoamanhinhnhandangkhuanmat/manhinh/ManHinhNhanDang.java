@@ -21,6 +21,9 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatEditText;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
@@ -28,7 +31,9 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.manhdd.nuce.khoamanhinhnhandangkhuanmat.DichVuManHinhKhoa;
@@ -63,6 +68,7 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
     private View rootView;
     private CameraBridgeViewBase mNhanDangCameraView;
     private Button btNhanDang;
+    private LinearLayout llMatKhau;
 
     private Mat mRgba, mGray;
     private TinyDB tinydb;
@@ -143,11 +149,11 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
                     String minDistString = String.format(Locale.US, "%.4f", minDist);
                     String faceDistString = String.format(Locale.US, "%.4f", faceDist);
 
-                    if (faceDist < 0.25f && minDist < 0.1f) { // 1. Near face space and near a face class
+                    if (faceDist < 0.26f && minDist < 0.1f) { // 1. Near face space and near a face class
                         Toast.makeText(ManHinhNhanDang.this, "Mở khoá thành công", Toast.LENGTH_SHORT).show();
                         Log.e("Recognize success", "Face detected: " + imagesLabels.get(minIndex) + ". Distance: " + minDistString);
                         moKhoa();
-                    } else if (faceDist < 0.25f) { // 2. Near face space but not near a known face class
+                    } else if (faceDist < 0.26f) { // 2. Near face space but not near a known face class
                         Toast.makeText(ManHinhNhanDang.this, "Mở khoá không thành công Vui lòng thử lại", Toast.LENGTH_SHORT).show();
                         Log.e("Recognize failed", "Unknown face. Face distance: " + faceDistString + ". Closest Distance: " + minDistString);
                     } else if (minDist < 0.1f) { // 3. Distant from face space and near a face class
@@ -223,14 +229,21 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
             ivQuayLai.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    finish();
+                    if(llMatKhau.getVisibility() == View.VISIBLE) {
+                        llMatKhau.setVisibility(View.GONE);
+                    } else {
+                        finish();
+                    }
                 }
             });
+
+            llMatKhau = (LinearLayout) rootView.findViewById(R.id.ll_mat_khau);
+            hienThiCaiDatMatMa();
 
             ivKhanCap.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-
+                    llMatKhau.setVisibility(View.VISIBLE);
                 }
             });
         }
@@ -532,6 +545,131 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
                     }
                 })
                 .show();
+    }
+
+    private void hienThiCaiDatMatMa() {
+
+        final String matKhau = sharedPreferences.getString("mat_khau", "");
+
+        final TextView tvMatKhau = (TextView) rootView.findViewById(R.id.tv_nhap_mat_khau);
+        tvMatKhau.setText("Nhập mật khẩu");
+
+        final AppCompatEditText etMatKhau = (AppCompatEditText) rootView.findViewById(R.id.et_mat_khau);
+        etMatKhau.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                String pass = editable.toString();
+                if(pass.equals(matKhau)) {
+                    moKhoa();
+                }
+            }
+        });
+
+        ImageView ivXoa = (ImageView) rootView.findViewById(R.id.iv_xoa);
+        Drawable icon = getResources().getDrawable(R.drawable.ic_xoa);
+        icon.mutate();
+        icon.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+        ivXoa.setImageDrawable(icon);
+
+        rootView.findViewById(R.id.tv_so_1).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                etMatKhau.setText(etMatKhau.getText().insert(etMatKhau.getSelectionEnd(), "1"));
+                etMatKhau.setSelection(etMatKhau.getText().length());
+            }
+        });
+
+        rootView.findViewById(R.id.tv_so_2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                etMatKhau.setText(etMatKhau.getText().insert(etMatKhau.getSelectionEnd(), "2"));
+                etMatKhau.setSelection(etMatKhau.getText().length());
+            }
+        });
+
+        rootView.findViewById(R.id.tv_so_3).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                etMatKhau.setText(etMatKhau.getText().insert(etMatKhau.getSelectionEnd(), "3"));
+                etMatKhau.setSelection(etMatKhau.getText().length());
+            }
+        });
+
+        rootView.findViewById(R.id.tv_so_4).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                etMatKhau.setText(etMatKhau.getText().insert(etMatKhau.getSelectionEnd(), "4"));
+                etMatKhau.setSelection(etMatKhau.getText().length());
+            }
+        });
+
+        rootView.findViewById(R.id.tv_so_5).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                etMatKhau.setText(etMatKhau.getText().insert(etMatKhau.getSelectionEnd(), "5"));
+                etMatKhau.setSelection(etMatKhau.getText().length());
+            }
+        });
+
+        rootView.findViewById(R.id.tv_so_6).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                etMatKhau.setText(etMatKhau.getText().insert(etMatKhau.getSelectionEnd(), "6"));
+                etMatKhau.setSelection(etMatKhau.getText().length());
+            }
+        });
+
+        rootView.findViewById(R.id.tv_so_7).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                etMatKhau.setText(etMatKhau.getText().insert(etMatKhau.getSelectionEnd(), "7"));
+                etMatKhau.setSelection(etMatKhau.getText().length());
+            }
+        });
+
+        rootView.findViewById(R.id.tv_so_8).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                etMatKhau.setText(etMatKhau.getText().insert(etMatKhau.getSelectionEnd(), "8"));
+                etMatKhau.setSelection(etMatKhau.getText().length());
+            }
+        });
+
+        rootView.findViewById(R.id.tv_so_9).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                etMatKhau.setText(etMatKhau.getText().insert(etMatKhau.getSelectionEnd(), "9"));
+                etMatKhau.setSelection(etMatKhau.getText().length());
+            }
+        });
+
+        rootView.findViewById(R.id.tv_so_0).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                etMatKhau.setText(etMatKhau.getText().insert(etMatKhau.getSelectionEnd(), "0"));
+                etMatKhau.setSelection(etMatKhau.getText().length());
+            }
+        });
+
+        rootView.findViewById(R.id.rl_xoa).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String pass = etMatKhau.getText().toString();
+                if (pass.length() > 0) {
+                    etMatKhau.setText(pass.substring(0, pass.length() - 1));
+                }
+            }
+        });
     }
 
 }

@@ -33,6 +33,8 @@ public class ManHinhChonHinhNenKhoa extends AppCompatActivity {
 
         setContentView(R.layout.man_hinh_chon_hinh_nen_khoa);
 
+        getSupportActionBar().setTitle("Cài đặt hình nền");
+
         final SharedPreferences sharedPreferences = getSharedPreferences("KhoaManHinhNhanDangKhuanMat", Context.MODE_PRIVATE);
         idManHinhDaLuu = sharedPreferences.getInt("id_man_hinh_khoa", R.drawable.anh_man_hinh_khoa1);
 

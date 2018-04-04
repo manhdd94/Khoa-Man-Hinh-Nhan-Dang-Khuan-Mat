@@ -86,6 +86,7 @@ public class ManHinhKhoa extends AppCompatActivity {
 //                            | View.SYSTEM_UI_FLAG_IMMERSIVE);
 //        }
 
+        // de len tat ca
         WindowManager.LayoutParams localLayoutParams = null;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             localLayoutParams = new WindowManager.LayoutParams(

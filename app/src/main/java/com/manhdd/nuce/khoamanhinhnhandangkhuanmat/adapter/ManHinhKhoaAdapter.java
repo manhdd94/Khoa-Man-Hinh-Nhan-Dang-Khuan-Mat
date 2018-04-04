@@ -30,8 +30,10 @@ public class ManHinhKhoaAdapter extends RecyclerView.Adapter<ManHinhKhoaAdapter.
         listIDHinhNen.add(R.drawable.anh_man_hinh_khoa1);
         listIDHinhNen.add(R.drawable.anh_man_hinh_khoa2);
         listIDHinhNen.add(R.drawable.anh_man_hinh_khoa3);
+        listIDHinhNen.add(R.drawable.anh_man_hinh_khoa4);
     }
 
+    // khoi tao view cho item
     @Override
     public ManHinhKhoaViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
@@ -41,12 +43,12 @@ public class ManHinhKhoaAdapter extends RecyclerView.Adapter<ManHinhKhoaAdapter.
 
     @Override
     public void onBindViewHolder(ManHinhKhoaViewHolder holder, final int position) {
-        final int hinhNenID = listIDHinhNen.get(position);
+        final int hinhNenID = listIDHinhNen.get(position); // lay id anh tu list
 
-        holder.ivHinhNenKhoa.setImageResource(hinhNenID);
+        holder.ivHinhNenKhoa.setImageResource(hinhNenID); // set anh cho view
 
         if(idManHinhDaLuu == hinhNenID) {
-            holder.llHinhNenKhoa.setBackgroundResource(R.drawable.line_border_selected);
+            holder.llHinhNenKhoa.setBackgroundResource(R.drawable.line_border_selected); // set duong vien cho anh
         } else {
             holder.llHinhNenKhoa.setBackgroundResource(0);
         }
@@ -55,7 +57,7 @@ public class ManHinhKhoaAdapter extends RecyclerView.Adapter<ManHinhKhoaAdapter.
             @Override
             public void onClick(View view) {
                 idManHinhDaLuu = hinhNenID;
-                notifyDataSetChanged();
+                notifyDataSetChanged(); // refresh lai list
                 if(mCallback != null) {
                     mCallback.chonHinhNen(idManHinhDaLuu);
                 }
@@ -68,6 +70,7 @@ public class ManHinhKhoaAdapter extends RecyclerView.Adapter<ManHinhKhoaAdapter.
         return listIDHinhNen.size();
     }
 
+    // class quan ly view
     public class ManHinhKhoaViewHolder extends RecyclerView.ViewHolder {
 
         private ImageView ivHinhNenKhoa;

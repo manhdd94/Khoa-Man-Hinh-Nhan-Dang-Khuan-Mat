@@ -39,7 +39,7 @@ import android.widget.Toast;
 import com.manhdd.nuce.khoamanhinhnhandangkhuanmat.DichVuManHinhKhoa;
 import com.manhdd.nuce.khoamanhinhnhandangkhuanmat.NativeMethods;
 import com.manhdd.nuce.khoamanhinhnhandangkhuanmat.R;
-import com.manhdd.nuce.khoamanhinhnhandangkhuanmat.chung.TinyDB;
+import com.manhdd.nuce.khoamanhinhnhandangkhuanmat.chung.FaceDB;
 import com.manhdd.nuce.khoamanhinhnhandangkhuanmat.view.CameraBridgeViewBase;
 
 import org.opencv.android.BaseLoaderCallback;
@@ -60,7 +60,7 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
 
     private static final String TAG = ManHinhNhanDang.class.getSimpleName();
     private static final int PERMISSIONS_REQUEST_CODE = 3232;
-    public final long DISCONNECT_TIMEOUT = 30000;
+    public final long DISCONNECT_TIMEOUT = 60000;
 
     public WindowManager winManager;
     public RelativeLayout wrapperView;
@@ -71,15 +71,15 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
     private LinearLayout llMatKhau;
 
     private Mat mRgba, mGray;
-    private TinyDB tinydb;
+    private FaceDB tinydb;
     private ArrayList<Mat> images;
     private ArrayList<String> imagesLabels;
     private NativeMethods.TrainFacesTask mTrainFacesTask;
     private String[] uniqueLabels;
-    private boolean isSetting;
+    private boolean isSetting, isRecognizeOldFace;
     private SharedPreferences sharedPreferences;
 
-    private Handler disconnectHandler = new Handler(){
+    private Handler disconnectHandler = new Handler() {
         public void handleMessage(Message msg) {
         }
     };
@@ -106,22 +106,20 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
         public void onManagerConnected(int status) {
             switch (status) {
                 case LoaderCallbackInterface.SUCCESS:
-                    NativeMethods.loadNativeLibraries(); // Load native libraries after(!) OpenCV initialization
+                    NativeMethods.loadNativeLibraries(); // Sau khi load openCV thi load thu vien nhan dang
                     Log.e(TAG, "OpenCV loaded successfully");
                     mNhanDangCameraView.enableView();
 
-                    if(!isSetting) {
-                        // Read images and labels from shared preferences
-                        images = tinydb.getListMat("images");
-                        imagesLabels = tinydb.getListString("imagesLabels");
+                    // Lay du lieu anh va label tu shared preference
+                    images = tinydb.getListMat("images");
+                    imagesLabels = tinydb.getListString("imagesLabels");
 
-                        Log.e(TAG, "Number of images: " + images.size() + ". Number of labels: " + imagesLabels.size());
-                        if (!images.isEmpty()) {
-                            trainFaces(); // Train images after they are loaded
-                            Log.e(TAG, "Images height: " + images.get(0).height() + " Width: " + images.get(0).width() + " total: " + images.get(0).total());
-                        }
-                        Log.e(TAG, "Labels: " + imagesLabels);
+                    Log.e(TAG, "Number of images: " + images.size() + ". Number of labels: " + imagesLabels.size());
+                    if (!images.isEmpty()) {
+                        trainFaces(); // Train images after they are loaded
+                        Log.e(TAG, "Images height: " + images.get(0).height() + " Width: " + images.get(0).width() + " total: " + images.get(0).total());
                     }
+                    Log.e(TAG, "Labels: " + imagesLabels);
 
                     break;
                 default:
@@ -150,17 +148,37 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
                     String faceDistString = String.format(Locale.US, "%.4f", faceDist);
 
                     if (faceDist < 0.26f && minDist < 0.1f) { // 1. Near face space and near a face class
-                        Toast.makeText(ManHinhNhanDang.this, "Mở khoá thành công", Toast.LENGTH_SHORT).show();
                         Log.e("Recognize success", "Face detected: " + imagesLabels.get(minIndex) + ". Distance: " + minDistString);
-                        moKhoa();
+                        if(isSetting) {
+                            isRecognizeOldFace = false;
+                            btNhanDang.setText("Lưu khuân mặt");
+                            images = new ArrayList<>();
+                            imagesLabels = new ArrayList<>();
+                            Toast.makeText(ManHinhNhanDang.this, "Nhận dạng thành công", Toast.LENGTH_SHORT).show();
+                        } else {
+                            moKhoa();
+                            Toast.makeText(ManHinhNhanDang.this, "Mở khoá thành công", Toast.LENGTH_SHORT).show();
+                        }
                     } else if (faceDist < 0.26f) { // 2. Near face space but not near a known face class
-                        Toast.makeText(ManHinhNhanDang.this, "Mở khoá không thành công Vui lòng thử lại", Toast.LENGTH_SHORT).show();
+                        if(isSetting) {
+                            Toast.makeText(ManHinhNhanDang.this, "Nhận dạng không thành công", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(ManHinhNhanDang.this, "Mở khoá không thành công Vui lòng thử lại", Toast.LENGTH_SHORT).show();
+                        }
                         Log.e("Recognize failed", "Unknown face. Face distance: " + faceDistString + ". Closest Distance: " + minDistString);
                     } else if (minDist < 0.1f) { // 3. Distant from face space and near a face class
-                        Toast.makeText(ManHinhNhanDang.this, "Mở khoá không thành công Vui lòng thử lại", Toast.LENGTH_SHORT).show();
+                        if(isSetting) {
+                            Toast.makeText(ManHinhNhanDang.this, "Nhận dạng không thành công", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(ManHinhNhanDang.this, "Mở khoá không thành công Vui lòng thử lại", Toast.LENGTH_SHORT).show();
+                        }
                         Log.e("Recognize failed", "False recognition. Face distance: " + faceDistString + ". Closest Distance: " + minDistString);
                     } else { // 4. Distant from face space and not near a known face class.
-                        Toast.makeText(ManHinhNhanDang.this, "Mở khoá không thành công Vui lòng thử lại", Toast.LENGTH_SHORT).show();
+                        if(isSetting) {
+                            Toast.makeText(ManHinhNhanDang.this, "Nhận dạng không thành công", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(ManHinhNhanDang.this, "Mở khoá không thành công Vui lòng thử lại", Toast.LENGTH_SHORT).show();
+                        }
                         Log.e("Recognize failed", "Image is not a face. Face distance: " + faceDistString + ". Closest Distance: " + minDistString);
                     }
                 }
@@ -180,7 +198,7 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
 
         isSetting = getIntent().getBooleanExtra("is_setting", true);
 
-        if(isSetting) {
+        if (isSetting) {
             setContentView(R.layout.man_hinh_nhan_dang);
             rootView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
         } else {
@@ -208,12 +226,12 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
             this.winManager.addView(this.wrapperView, localLayoutParams);
         }
 
-        tinydb = new TinyDB(this);
+        tinydb = new FaceDB(this);
 
         mNhanDangCameraView = (CameraBridgeViewBase) rootView.findViewById(R.id.camera_view);
         mNhanDangCameraView.setCameraIndex(CameraBridgeViewBase.CAMERA_ID_FRONT);
         mNhanDangCameraView.setVisibility(SurfaceView.VISIBLE);
-        mNhanDangCameraView.setCvCameraViewListener(this);
+        mNhanDangCameraView.setCvCameraViewListener(this); // cai dat cac ham lang nghe su kien
 
         ImageView ivKhanCap = (ImageView) rootView.findViewById(R.id.iv_khan_cap);
 
@@ -222,14 +240,14 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
         icon.mutate();
         icon.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
         ivQuayLai.setImageDrawable(icon);
-        if(isSetting) {
+        if (isSetting) {
             ivQuayLai.setVisibility(View.GONE);
             ivKhanCap.setVisibility(View.GONE);
         } else {
             ivQuayLai.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if(llMatKhau.getVisibility() == View.VISIBLE) {
+                    if (llMatKhau.getVisibility() == View.VISIBLE) {
                         llMatKhau.setVisibility(View.GONE);
                     } else {
                         finish();
@@ -240,20 +258,20 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
             llMatKhau = (LinearLayout) rootView.findViewById(R.id.ll_mat_khau);
             hienThiCaiDatMatMa();
 
-            ivKhanCap.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    llMatKhau.setVisibility(View.VISIBLE);
-                }
-            });
+            String matKhau = sharedPreferences.getString("mat_khau", "");
+            if (matKhau.equals("")) {
+                ivKhanCap.setVisibility(View.GONE);
+            } else {
+                ivKhanCap.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        llMatKhau.setVisibility(View.VISIBLE);
+                    }
+                });
+            }
         }
 
         btNhanDang = (Button) rootView.findViewById(R.id.bt_nhan_dang);
-        if (isSetting) {
-            btNhanDang.setText("Lưu khuân mặt");
-        } else {
-            btNhanDang.setText("Mở khoá");
-        }
         btNhanDang.setOnClickListener(new View.OnClickListener() {
 
             NativeMethods.MeasureDistTask mMeasureDistTask;
@@ -273,13 +291,13 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
                 if (mGray.total() == 0)
                     return;
                 Size imageSize = new Size(200, 200.0f / ((float) mGray.width() / (float) mGray.height())); // Scale image in order to decrease computation time
-                Imgproc.resize(mGray, mGray, imageSize);
+                Imgproc.resize(mGray, mGray, imageSize); // resize lai anh
                 Log.i(TAG, "Small gray height: " + mGray.height() + " Width: " + mGray.width() + " total: " + mGray.total());
                 //SaveImage(mGray);
 
-                Mat image = mGray.reshape(0, (int) mGray.total()); // Create column vector
+                Mat image = mGray.reshape(0, (int) mGray.total()); // Tao cac column vector
 
-                if (isSetting) {
+                if (isSetting && !isRecognizeOldFace) {
                     onSetupFace(image);
                 } else {
                     onRecognizeFace(image, mMeasureDistTask);
@@ -289,6 +307,12 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
 
         if (sharedPreferences.getBoolean("is_first_run", true)) {
             hienThiHuongDan();
+            btNhanDang.setText("Lưu khuân mặt");
+        } else if(isSetting) {
+            isRecognizeOldFace = true;
+            btNhanDang.setText("Nhận dạng khuân mặt đã lưu");
+        } else {
+            btNhanDang.setText("Mở khoá");
         }
     }
 
@@ -301,7 +325,7 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
     public void onResume() {
         super.onResume();
 
-        // Request permission if needed
+        // Hoi quyen truy cap camera
         if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PERMISSIONS_REQUEST_CODE);
         } else {
@@ -324,7 +348,7 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
 
     @Override
     public void onDestroy() {
-        if(!isSetting) {
+        if (!isSetting) {
             this.winManager.removeView(this.wrapperView);
             this.wrapperView.removeAllViews();
         }
@@ -370,7 +394,7 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
         Mat mGrayTmp = inputFrame.gray();
         Mat mRgbaTmp = inputFrame.rgba();
 
-        // Flip image to get mirror effect
+        // Xoay lai anh cho dung chieu
         int orientation = mNhanDangCameraView.getScreenOrientation();
         if (mNhanDangCameraView.isEmulator()) // Treat emulators as a special case
             Core.flip(mRgbaTmp, mRgbaTmp, 1); // Flip along y-axis
@@ -431,9 +455,9 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
     }
 
     /**
-     * Train faces using stored images.
+     * train dữ liệu cho phần dữ xử lý
      *
-     * @return Returns false if the task is already running.
+     * @return Tra ve false neu task nay dang chay
      */
     private boolean trainFaces() {
         if (images.isEmpty())
@@ -478,6 +502,7 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
         Mat vectorClasses = new Mat(classes.length, 1, CvType.CV_32S); // CV_32S == int
         vectorClasses.put(0, 0, classes); // Copy int array into a vector
 
+        // day du lieu vao cho phan xu ly
         mTrainFacesTask = new NativeMethods.TrainFacesTask(imagesMatrix, vectorClasses, trainFacesTaskCallback);
 
         mTrainFacesTask.execute();
@@ -487,16 +512,16 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
 
     // Lưu khuân mặt mới
     private void onSetupFace(Mat image) {
-        if(images == null) {
+        if (images == null) {
             images = new ArrayList<>();
         }
         images.add(image);
 
-        if(imagesLabels == null) {
+        if (imagesLabels == null) {
             imagesLabels = new ArrayList<>();
         }
 
-        if(images.size() == 3) {
+        if (images.size() == 3) {
             imagesLabels.add("Admin_2");
             tinydb.putListMat("images", images);
             tinydb.putListString("imagesLabels", imagesLabels);
@@ -526,12 +551,12 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
         finishAffinity();
     }
 
-    public void resetDisconnectTimer(){
+    public void resetDisconnectTimer() {
         disconnectHandler.removeCallbacks(disconnectCallback);
         disconnectHandler.postDelayed(disconnectCallback, DISCONNECT_TIMEOUT);
     }
 
-    public void stopDisconnectTimer(){
+    public void stopDisconnectTimer() {
         disconnectHandler.removeCallbacks(disconnectCallback);
     }
 
@@ -569,7 +594,7 @@ public class ManHinhNhanDang extends AppCompatActivity implements CameraBridgeVi
             @Override
             public void afterTextChanged(Editable editable) {
                 String pass = editable.toString();
-                if(pass.equals(matKhau)) {
+                if (pass.equals(matKhau)) {
                     moKhoa();
                 }
             }

@@ -17,6 +17,7 @@ import android.support.v7.widget.AppCompatEditText;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.CompoundButton;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -36,7 +37,7 @@ public class ManHinhCaiDat extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        sharedPreferences = getSharedPreferences("KhoaManHinhNhanDangKhuanMat", Context.MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences("KhoaManHinhNhanDangKhuanMat", Context.MODE_PRIVATE); // goi thanh phan luu du lieu
 
         mIntent = new Intent(this, DichVuManHinhKhoa.class);
 
@@ -44,9 +45,9 @@ public class ManHinhCaiDat extends AppCompatActivity {
             hienThiYeuCauCaiDatKhuanMat();
         }
 
-        setContentView(R.layout.man_hinh_cai_dat);
+        setContentView(R.layout.man_hinh_cai_dat); // gán view vào
 
-        getSupportActionBar().setTitle("Cài đặt màn hình khoá");
+        getSupportActionBar().setTitle("Cài đặt màn hình khoá"); // chữ trên thanh tiêu đề
 
         TextView tvCaiDatKhuanMat = (TextView) findViewById(R.id.tv_cai_dat_khuan_mat);
         tvCaiDatKhuanMat.setOnClickListener(new View.OnClickListener() {
@@ -75,7 +76,19 @@ public class ManHinhCaiDat extends AppCompatActivity {
                     startService(mIntent);
                 }
                 swSuDungManHinhKhoa.setChecked(!enable);
-                sharedPreferences.edit().putBoolean("is_enable", !enable).apply();
+                sharedPreferences.edit().putBoolean("is_enable", !enable).apply(); // luu config bat/tat
+            }
+        });
+
+        swSuDungManHinhKhoa.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b) {
+                    startService(mIntent);
+                } else {
+                    stopService(mIntent);
+                }
+                sharedPreferences.edit().putBoolean("is_enable", b).apply();
             }
         });
 
@@ -125,13 +138,13 @@ public class ManHinhCaiDat extends AppCompatActivity {
 
     private void hienThiCaiDatMatMa() {
         final Dialog dialog = new Dialog(this);
-        dialog.setCancelable(true);
-        dialog.setTitle("Cài đặt mật khẩu dùng trong trường hợp khẩn cấp");
+        dialog.setCancelable(true); // để khi bấm ra ngoài sẽ tắt dialog
 
         LayoutInflater inflater = LayoutInflater.from(this);
-        View view = inflater.inflate(R.layout.dialog_cai_dat_mat_ma, null);
-        dialog.setContentView(view);
+        View view = inflater.inflate(R.layout.dialog_cai_dat_mat_ma, null); // gọi view
+        dialog.setContentView(view); // custom giao diện dialog
 
+        // set chieu rong cho dialog
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
         lp.copyFrom(dialog.getWindow().getAttributes());
         lp.width = getResources().getDisplayMetrics().widthPixels;
